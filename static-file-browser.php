@@ -13,32 +13,32 @@
 /**
  * Initializes the plugin by hooking into the media browser
  */
-function file_browser_init() {
+function sfb_init() {
     if ( current_user_can('upload_files') ) {
-        add_filter('media_upload_tabs', 'file_browser_media_menu');
-        add_action('media_upload_file_browser', 'file_browser_media_iframe');
+        add_filter('media_upload_tabs', 'sfb_media_menu');
+        add_action('media_upload_file_browser', 'sfb_media_iframe');
     }
 }
 
 /**
  * Adds a tab to the media browser
  */
-function file_browser_media_menu($tabs) {
-    $tabs['file_browser'] = 'Static File Browser';
+function sfb_media_menu($tabs) {
+    $tabs['sfb'] = 'Static File Browser';
     return $tabs;
 }
 
 /**
  * Registers the iframe for the media browser
  */
-function file_browser_media_iframe() {
-    wp_iframe('file_browser_media_iframe_content');
+function sfb_media_iframe() {
+    wp_iframe('sfb_media_iframe_content');
 }
 
 /**
  * Returns the content of the file browser
  */
-function file_browser_media_iframe_content() {
+function sfb_media_iframe_content() {
 
     // Find dir for static uploads and the assiciated url
     $upload_dir = wp_upload_dir();
@@ -55,7 +55,7 @@ function file_browser_media_iframe_content() {
     }
 
     // Find the relative paths of all files
-    $files = file_browser_get_dir_contents($dir);
+    $files = sfb_get_dir_contents($dir);
     foreach ($files as $key => $file) {
         if (substr($file, 0, strlen($dir)) == $dir) {
             $files[$key] = substr($file, strlen($dir));
@@ -76,7 +76,7 @@ function file_browser_media_iframe_content() {
         }
     </style>
     <script type="text/javascript">
-    function file_browser_insert_file(filename) {
+    function sfb_insert_file(filename) {
         var network_url = '<?=$url; ?>';
         var link = '<a href="' + network_url + filename + '" target="_blank">' + filename + '</a>';
         var win = window.dialogArguments || opener || parent || top;
@@ -89,7 +89,7 @@ function file_browser_media_iframe_content() {
         <div class="media-items">
             <?php foreach ($files as $file): ?>
             <div class="media-item">
-                <a href="javascript:file_browser_insert_file('<?=$file; ?>')" class="insert-button">Insert</a>
+                <a href="javascript:sfb_insert_file('<?=$file; ?>')" class="insert-button">Insert</a>
                 <div class="filename">
                     <span class="title"><?=$file; ?></span>
                 </div>
@@ -103,7 +103,7 @@ function file_browser_media_iframe_content() {
 /**
  * Lists the content of the provided directory recursively
  */
-function file_browser_get_dir_contents($dir, &$results = array()){
+function sfb_get_dir_contents($dir, &$results = array()){
     $files = scandir($dir);
 
     foreach($files as $key => $value){
@@ -111,7 +111,7 @@ function file_browser_get_dir_contents($dir, &$results = array()){
         if(!is_dir($path)) {
             $results[] = $path;
         } else if($value != "." && $value != "..") {
-            file_browser_get_dir_contents($path, $results);
+            sfb_get_dir_contents($path, $results);
             $results[] = $path;
         }
     }
@@ -120,4 +120,4 @@ function file_browser_get_dir_contents($dir, &$results = array()){
 }
 
 // Init hook
-add_action( 'init', 'file_browser_init' );
+add_action( 'init', 'sfb_init' );
